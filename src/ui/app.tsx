@@ -151,12 +151,18 @@ export function App() {
         setStoredValue(undefined);
     }
 
+    async function clearValue() {
+        const value = await contract.clearValue(account);
+        toast('Successfully cleared the stored value.', { type: 'success' });
+
+    }
+
     async function addNewValue() {
         try {
             setTransactionInProgress(true);
             await contract.addValue(newStoredNumberInputValue, account);
             toast(
-                'Successfully set latest stored value. You can refresh the read value now manually.',
+                'Successfully added to the stored value. You can refresh the read value now manually.',
                 { type: 'success' }
             );
         } catch (error) {
@@ -174,7 +180,43 @@ export function App() {
             setTransactionInProgress(true);
             await contract.subtractValue(newStoredNumberInputValue, account);
             toast(
-                'Successfully set latest stored value. You can refresh the read value now manually.',
+                'Successfully subtracted the stored value. You can refresh the read value now manually.',
+                { type: 'success' }
+            );
+        } catch (error) {
+            console.error(error);
+            toast.error(
+                'There was an error sending your transaction. Please check developer console.'
+            );
+        } finally {
+            setTransactionInProgress(false);
+        }
+    }
+
+    async function divideNewValue() {
+        try {
+            setTransactionInProgress(true);
+            await contract.divideValue(newStoredNumberInputValue, account);
+            toast(
+                'Successfully divided the stored value. You can refresh the read value now manually.',
+                { type: 'success' }
+            );
+        } catch (error) {
+            console.error(error);
+            toast.error(
+                'There was an error sending your transaction. Please check developer console.'
+            );
+        } finally {
+            setTransactionInProgress(false);
+        }
+    }
+
+    async function multiplyNewValue() {
+        try {
+            setTransactionInProgress(true);
+            await contract.multiplyValue(newStoredNumberInputValue, account);
+            toast(
+                'Successfully multiplied the stored value. You can refresh the read value now manually.',
                 { type: 'success' }
             );
         } catch (error) {
@@ -263,14 +305,34 @@ export function App() {
             <button onClick={addNewValue} disabled={!contract}>
                 Add to the stored value.
             </button>
-            <br />
-            <br />
+
             <input
                 type="number"
                 onChange={e => setNewStoredNumberInputValue(parseInt(e.target.value, 10))}
             />
             <button onClick={subNewValue} disabled={!contract}>
                 Subtract stored value.
+            </button>
+
+            <input
+                type="number"
+                onChange={e => setNewStoredNumberInputValue(parseInt(e.target.value, 10))}
+            />
+            <button onClick={multiplyNewValue} disabled={!contract}>
+                Multiply the stored value.
+            </button>
+
+            <input
+                type="number"
+                onChange={e => setNewStoredNumberInputValue(parseInt(e.target.value, 10))}
+            />
+            <button onClick={divideNewValue} disabled={!contract}>
+                Divide the stored value.
+            </button>
+            <br />
+            <br />
+            <button onClick={clearValue} disabled={!contract}>
+                Clear the stored value
             </button>
             <br />
             <br />

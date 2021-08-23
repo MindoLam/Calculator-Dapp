@@ -1,5 +1,29 @@
 body {
     padding: 20px;
+    background-color: red;
+}
+
+.c-button {
+    -webkit-appearance: none;
+    -moz-apperance: none;
+    apperance: none;
+    border: 0;
+    border-radius: 0;
+    background: #ccc;
+}
+
+.c-button {
+    appearance: none;
+    border: 0;
+    border-radius: 5px;
+    background: #4676D7;
+    color: #fff;
+    padding: 8px 16px;
+    font-size: 16px;
+}
+
+input[type="text"] {
+    width: 100px;
 }
 
 .rotating-icon {

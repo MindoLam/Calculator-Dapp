@@ -33,6 +33,10 @@ export interface AdditionSubtraction extends BaseContract {
 
     subtract(y: number | string | BN): PayableTransactionObject<void>;
 
+    divide(w: number | string | BN): PayableTransactionObject<void>;
+
+    multiply(z: number | string | BN): PayableTransactionObject<void>;
+
     show(): NonPayableTransactionObject<string>;
 
     clear(): PayableTransactionObject<void>;

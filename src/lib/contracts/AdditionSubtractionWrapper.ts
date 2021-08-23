@@ -48,11 +48,30 @@ export class AdditionSubtractionWrapper {
         return tx;
     }
 
-    async clearValue(value: number, fromAddress: string) {
-        const tx = await this.contract.methods.clear().send({
+    async multiplyValue(value: number, fromAddress: string) {
+        const tx = await this.contract.methods.multiply(value).send({
             ...DEFAULT_SEND_OPTIONS,
             from: fromAddress,
             value
+        });
+
+        return tx;
+    }
+
+    async divideValue(value: number, fromAddress: string) {
+        const tx = await this.contract.methods.divide(value).send({
+            ...DEFAULT_SEND_OPTIONS,
+            from: fromAddress,
+            value
+        });
+
+        return tx;
+    }
+
+    async clearValue(fromAddress: string) {
+        const tx = await this.contract.methods.clear().send({
+            ...DEFAULT_SEND_OPTIONS,
+            from: fromAddress,
         });
 
         return tx;
