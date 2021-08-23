@@ -1,4 +1,4 @@
-# Blockchain workshop
+# Calculator DApp
 
 Start UI:
 
