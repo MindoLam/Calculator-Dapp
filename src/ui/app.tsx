@@ -8,13 +8,15 @@ import './app.scss';
 import 'react-toastify/dist/ReactToastify.css';
 import { PolyjuiceHttpProvider } from '@polyjuice-provider/web3';
 import { AddressTranslator } from 'nervos-godwoken-integration';
-
+import * as ERC20 from '../../build/contracts/ERC20.json'
 import { AdditionSubtractionWrapper } from '../lib/contracts/AdditionSubtractionWrapper';
 import { CONFIG } from '../config';
 
+
 async function createWeb3() {
     // Modern dapp browsers...
-    if ((window as any).ethereum) {
+    const {ethereum} = window as any;
+    if (ethereum && ethereum.isMetaMask) {
         const godwokenRpcUrl = CONFIG.WEB3_PROVIDER_URL;
         const providerConfig = {
             rollupTypeHash: CONFIG.ROLLUP_TYPE_HASH,
@@ -48,6 +50,9 @@ export function App() {
     const [storedValue, setStoredValue] = useState<number | undefined>();
     const [deployTxHash, setDeployTxHash] = useState<string | undefined>();
     const [polyjuiceAddress, setPolyjuiceAddress] = useState<string | undefined>();
+    const [depositAddress, setDepositAddress] = useState<string | undefined>();
+    const [ckETHBalance, setckETHBalance] = useState<string>();
+    const [layer2Address, setLayer2Address] = useState<string | undefined>();
     const [transactionInProgress, setTransactionInProgress] = useState(false);
     const toastId = React.useRef(null);
     const [newStoredNumberInputValue, setNewStoredNumberInputValue] = useState<
@@ -55,13 +60,32 @@ export function App() {
     >();
 
     useEffect(() => {
+        (async () => {
         if (accounts?.[0]) {
             const addressTranslator = new AddressTranslator();
             setPolyjuiceAddress(addressTranslator.ethAddressToGodwokenShortAddress(accounts?.[0]));
+
+            const _polyjuiceAddress = addressTranslator.ethAddressToGodwokenShortAddress(accounts?.[0]);
+            const ckETHContract = new web3.eth.Contract(
+                ERC20.abi as never,
+                CONFIG.CKETH_PROXY_CONTRACT);
+
+            const balance = await ckETHContract.methods.balanceOf(_polyjuiceAddress).call({
+                from: accounts?.[0]
+            });
+            setckETHBalance(balance);
+
+            addressTranslator
+            .getLayer2DepositAddress(web3, (window as any).ethereum.selectedAddress)
+            .then(depositaddy => {
+                setDepositAddress(depositaddy.addressString);
+            })
         } else {
             setPolyjuiceAddress(undefined);
         }
+    })();
     }, [accounts?.[0]]);
+
 
     useEffect(() => {
         if (transactionInProgress && !toastId.current) {
@@ -85,6 +109,7 @@ export function App() {
     }, [transactionInProgress, toastId.current]);
 
     const account = accounts?.[0];
+
 
     async function deployContract() {
         const _contract = new AdditionSubtractionWrapper(web3);
@@ -196,8 +221,14 @@ export function App() {
             <b>{l2Balance ? (l2Balance / 10n ** 8n).toString() : <LoadingIndicator />} CKB</b>
             <br />
             <br />
+            ckETH Balance: <b>{ckETHBalance ? (parseInt(ckETHBalance) / 1000000000000000000).toString() : <LoadingIndicator />} ckETH</b>
+            <br />
+            <br />
             Deployed contract address: <b>{contract?.address || '-'}</b> <br />
             Deploy transaction hash: <b>{deployTxHash || '-'}</b>
+            <br />
+            <br />
+            Layer 2 Deposit: <b> {depositAddress || ' - '}</b>
             <br />
             <hr />
             <p>
@@ -241,6 +272,10 @@ export function App() {
             <button onClick={subNewValue} disabled={!contract}>
                 Subtract stored value.
             </button>
+            <br />
+            <br />
+            Use this force brige here <a href="https://force-bridge-test.ckbapp.dev/bridge/Ethereum/Nervos?xchain-asset=0x0000000000000000000000000000000000000000"> Force Bridge </a>
+            to transfer tokens to the layer 2. Input your layer 2 deposit address as the receipent.
             <ToastContainer />
         </div>
     );

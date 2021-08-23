@@ -1,4 +1,4 @@
-# Calculator Nervos Dapp
+# Blockchain workshop
 
 Start UI:
 
